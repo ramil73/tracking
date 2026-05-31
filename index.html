@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AnimalTrack — GPS Animal Monitoring</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🐾</text></svg>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── Top bar ──────────────────────────────────────────── -->
+  <header class="topbar">
+    <a class="logo" href="#">
+      <div class="logo-icon">🐾</div>
+      AnimalTrack
+    </a>
+
+    <nav class="topbar-center">
+      <div class="nav-item active" data-tab="animals"   onclick="App.switchTab('animals')">
+        <span class="nav-icon">🐾</span> Animals
+      </div>
+      <div class="nav-item" data-tab="alerts"    onclick="App.switchTab('alerts')">
+        <span class="nav-icon">🔔</span> Alerts
+      </div>
+      <div class="nav-item" data-tab="history"   onclick="App.switchTab('history')">
+        <span class="nav-icon">📋</span> History
+      </div>
+      <div class="nav-item" data-tab="geofences" onclick="App.switchTab('geofences')">
+        <span class="nav-icon">⬡</span> Geofences
+      </div>
+      <div class="nav-item" data-tab="register"  onclick="App.switchTab('register')">
+        <span class="nav-icon">➕</span> Register
+      </div>
+      <div class="nav-item" data-tab="settings"  onclick="App.switchTab('settings')">
+        <span class="nav-icon">⚙️</span> Settings
+      </div>
+    </nav>
+
+    <div class="topbar-right">
+      <button class="alert-btn" onclick="App.switchTab('alerts')" title="Alerts">
+        🔔
+        <span id="alert-badge" style="display:none">0</span>
+      </button>
+      <button class="btn btn-primary" onclick="App.switchTab('register')">+ Register</button>
+    </div>
+  </header>
+
+  <!-- ── Main ─────────────────────────────────────────────── -->
+  <div class="main">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-body" id="sidebar-content">
+        <!-- rendered by JS -->
+      </div>
+    </aside>
+
+    <!-- Map -->
+    <div class="map-wrap">
+      <div id="map"></div>
+
+      <!-- Map controls -->
+      <div class="map-controls">
+        <button class="map-ctrl" onclick="App.fitAll()" title="Fit all animals">📍 Fit All</button>
+        <button class="map-ctrl active" id="btn-geofences" onclick="App.toggleMapGeofences()">⬡ Geofences</button>
+        <button class="map-ctrl" id="btn-trails" onclick="App.toggleMapTrails()">〰 Trails</button>
+      </div>
+
+      <!-- Animal detail panel -->
+      <div class="detail-panel" id="detail-panel">
+        <button class="detail-close" onclick="App.closeDetail()">×</button>
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/map.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+<script>
+  // Wire up map flyTo event from history panel
+  document.addEventListener('flyToCoords', e => {
+    const { lat, lng } = e.detail;
+    if (window._leafletMap) window._leafletMap.flyTo([lat, lng], 17, { duration: 0.6 });
+  });
+
+  // Expose map instance after init
+  const _origInit = MapModule.init.bind(MapModule);
+  MapModule.init = (...args) => {
+    const m = _origInit(...args);
+    window._leafletMap = m;
+    return m;
+  };
+
+  document.addEventListener('DOMContentLoaded', () => App.boot());
+</script>
+
+</body>
+</html>
